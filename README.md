@@ -42,44 +42,45 @@ The application is composed of three main parts: a **Frontend**, a **Backend API
 
 The **Frontend** application likely serves as a control panel or a more comprehensive interface, possibly for creating/managing the bots whose context is stored in ChromaDB.
 
-## Running the Application
+## 🚀 Quick Start
 
-### 1. Backend
+Use the automation scripts to set up and run the entire project quickly.
 
-The backend is a Python FastAPI application.
+### 1. Setup
+Install all dependencies (Python & Node) and create the virtual environment:
+```bash
+./setup.sh
+```
 
--   **Navigate to the backend directory:**
-    ```bash
-    cd backend
-    ```
--   **Install dependencies (if you haven't already):**
-    ```bash
-    pip install -r requirements.txt
-    ```
--   **Run the backend server:**
-    ```bash
-    uvicorn main:app --reload --host 0.0.0.0 --port 8000
+### 2. Run
+Start both the Frontend and Backend servers simultaneously:
+```bash
+./run.sh
+```
 
-    ```
-    The backend will typically run on `http://localhost:8000`.
+### 3. Usage
+- **Admin Dashboard**: [http://localhost:5173](http://localhost:5173) (Create bots & manage accounts)
+- **API/Widget Host**: [http://localhost:8000](http://localhost:8000)
+- **Test Widget**: Open `widget/chat-widget-test.html` in your browser.
 
-### 2. Frontend
+---
 
-The frontend is a Vite application.
+## 🛠️ Detailed Architecture
+The application is composed of three main parts: a **Frontend**, a **Backend API**, and a **Chat Widget**.
 
--   **Navigate to the frontend directory:**
-    ```bash
-    cd frontend
-    ```
--   **Install dependencies (if you haven't already):**
-    ```bash
-    npm install
-    ```
--   **Run the frontend development server:**
-    ```bash
-    npm run dev
-    ```
-    The frontend will typically run on `http://localhost:5173`.
+1.  **Backend (Python/FastAPI)**:
+    *   **Core Hub**: Processes chat and manages context using RAG (Retrieval Augmented Generation).
+    *   **Database**: Uses **MySQL** for user/bot metadata and **ChromaDB** for vector storage.
+    *   **LLM**: Integrated with **Google Gemini AI** for intelligent responses.
+    *   **Embeddings**: Powered by `all-MiniLM-L6-v2`.
+
+2.  **Frontend (Vite/React)**:
+    *   **MyBot Dashboard**: A premium UI for users to register, login, and create multiple chatbots.
+    *   **Embed Snippets**: Generates one-line script tags for embedding bots on any site.
+
+3.  **Chat Widget (Messenger Style)**:
+    *   A clean, modern chat interface that can be embedded anywhere.
+    *   Supports Markdown rendering and real-time AI interaction.
 
 ### 3. Chat Widget
 

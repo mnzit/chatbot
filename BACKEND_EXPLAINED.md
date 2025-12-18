@@ -4,6 +4,27 @@ This document explains the "brains" of the chatbot project in simple terms, cove
 
 ---
 
+## 🚀 Getting Started
+
+To get the project up and running quickly, use the provided automation scripts:
+
+### 1. First Time Setup
+Run the setup script to create a virtual environment, install Python dependencies, and set up the Node.js frontend:
+```bash
+./setup.sh
+```
+
+### 2. Running the Servers
+Once setup is complete, you can start both the Backend (FastAPI) and Frontend (Vite) with a single command:
+```bash
+./run.sh
+```
+*   **Frontend**: [http://localhost:5173](http://localhost:5173)
+*   **Backend/Widget**: [http://localhost:8000](http://localhost:8000)
+*   **Press `Ctrl + C`** to gracefully stop both servers.
+
+---
+
 ## 🏗️ The Big Picture
 The project is split into three main parts:
 1.  **The Backend (FastAPI)**: The "Server" that does all the thinking.
