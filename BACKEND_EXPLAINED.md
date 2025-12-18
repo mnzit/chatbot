@@ -93,6 +93,37 @@ To ensure the project is scalable and professional, we refactored the backend in
     *   `endpoints/bots.py`: Handles creating and listing your custom chatbots.
     *   `endpoints/chat.py`: Handles the actual messaging logic.
 
+### 📂 Deep Dive: File-by-File Explanation
+
+If you open the `backend/app` folder, here is exactly what each file is doing:
+
+#### 1. `app/main.py`
+The **Command Center**. It creates the FastAPI "application" object, connects the database, sets up security rules (CORS), and mounts the "Widget" folder so it can be served as a website. It "includes" all other routers so the API knows which URLs exist.
+
+#### 2. `app/core/` (The Vital Organs)
+*   **`config.py`**: The **Standardized Settings**. It reads your `.env` file and converts those text strings into Python objects that the rest of the app can easily use (like your Gemini API key or Database URL).
+*   **`security.py`**: The **Shield**. It contains the logic to lock doors (create JWT tokens) and check IDs (verify passwords).
+
+#### 3. `app/db/` (The Foundation)
+*   **`session.py`**: The **Database Connector**. It creates the "Engine" that talks to MySQL. It also provides the `get_db` function, which is used throughout the app to open and close database connections safely.
+
+#### 4. `app/models/` (The Identity)
+*   **`user.py` & `bot.py`**: The **Table Definitions**. These files tell MySQL exactly how to create the `users` and `bots` tables. They define that a "User" has an email and a password, and a "Bot" has a name and belongs to a specific User.
+
+#### 5. `app/schemas/` (The Translators)
+*   **`user.py`, `bot.py`, `token.py`**: The **Data Enforcers**. While `models` are for the database, `schemas` are for the API. They ensure that if a user tries to register with a missing password, the system stops them before the database ever gets involved.
+
+#### 6. `app/services/` (The Workers)
+*   **`ai_service.py`**: The **AI Specialist**. It encapsulates all the logic for communicating with Google Gemini.
+*   **`vector_service.py`**: The **Librarian**. It handles the heavy lifting of turning text into numbers (Embeddings) and saving/searching them in ChromaDB.
+
+#### 7. `app/api/` (The Interface)
+*   **`deps.py`**: The **Traffic Controller**. It contains helper functions used by routes, like `get_current_user`, which checks if someone is logged in before letting them see their bots.
+*   **`endpoints/`**:
+    *   `auth.py`: Handles `/register` and `/token` (Login).
+    *   `bots.py`: Handles `/bots` (Creating and listing your bots).
+    *   `chat.py`: Handles `/chat` (The actual AI messaging loop).
+
 ### 📐 SOLID Principles Applied
 1.  **Single Responsibility Principle (SRP)**:
     *   Every file has one job. `ai_service.py` handles AI, `security.py` handles security. If you want to change your database, you only ever touch the `db/` folder.
