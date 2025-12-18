@@ -70,11 +70,38 @@ The `chat-widget.js` is a "plugin" that can be added to any website.
 
 ---
 
-## 📁 4. Project Structure (For Techies)
-*   `backend/main.py`: The brain. Handles API requests and Gemini integration.
-*   `backend/chroma_db/`: The physical files where the memory is stored.
-*   `widget/chat-widget.js`: The frontend script you embed on other sites.
-*   `frontend/`: The dashboard you use to create and manage your bots.
+## 🏛️ 4. Modular Architecture & SOLID
+
+To ensure the project is scalable and professional, we refactored the backend into a modular architecture following **SOLID** principles. The code is organized into a standard Python web application structure:
+
+### 📁 Detailed File Breakdown
+*   **`backend/app/main.py`**: The entry point. It initializes the database, configures CORS, and wires together all the different API modules.
+*   **`backend/app/core/`**: 
+    *   `config.py`: Centralized settings using Pydantic. It handles everything from API keys to folder paths.
+    *   `security.py`: Logic for hashing passwords and generating secure JWT (JSON Web Token) access keys.
+*   **`backend/app/db/`**:
+    *   `session.py`: Handles the connection to your **MySQL** database and provides a "Session" to other parts of the app.
+*   **`backend/app/models/`**: 
+    *   The "Database Blueprints". Defines the `User` and `Bot` tables for MySQL.
+*   **`backend/app/schemas/`**: 
+    *   The "Data Filters". These ensure that whatever data comes from the user (like an email or a message) is correctly formatted before the app processes it.
+*   **`backend/app/services/`**:
+    *   `ai_service.py`: A specialized worker that only talks to **Google Gemini**.
+    *   `vector_service.py`: A worker that manages **ChromaDB** and the text-to-coordinates transformation.
+*   **`backend/app/api/`**:
+    *   `endpoints/auth.py`: Handles registration and logging in.
+    *   `endpoints/bots.py`: Handles creating and listing your custom chatbots.
+    *   `endpoints/chat.py`: Handles the actual messaging logic.
+
+### 📐 SOLID Principles Applied
+1.  **Single Responsibility Principle (SRP)**:
+    *   Every file has one job. `ai_service.py` handles AI, `security.py` handles security. If you want to change your database, you only ever touch the `db/` folder.
+2.  **Open/Closed Principle**:
+    *   The architecture is "Open for extension". If you want to add a "Voice Recognition" feature, you simply add a new service and a new API file without breaking the existing Chat logic.
+3.  **Interface Segregation**:
+    *   The frontend only sees the "Schemas" it needs. It doesn't need to know how the vector database works internally; it just sends a message and gets a reply.
+4.  **Dependency Inversion**:
+    *   We use **Dependency Injection** (via FastAPI's `Depends`). This means the API routes "ask" for a database session rather than creating one themselves, making the code much easier to test and manage.
 
 ---
 
@@ -98,6 +125,8 @@ To find the right context, the system calculates the "distance" between the user
 The final step uses the **`gemini-flash-latest`** model from Google.
 *   **Type**: A generative pretrained transformer.
 *   **Process**: It uses **In-Context Learning**. By providing the retrieved snippets inside the prompt, we "steer" the model to behave like a specialist assistant rather than a general-purpose AI.
+
+---
 
 ## 🚀 Summary for Laymen
 Imagine a librarian who has a photographic memory but only for the books you give them. When you ask a question, the librarian finds the right page in their memory, reads it, and then explains the answer to you in natural English. **That is exactly what this project does.**
