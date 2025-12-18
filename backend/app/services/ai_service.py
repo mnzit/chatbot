@@ -9,9 +9,14 @@ class AIService:
 
     async def generate_response(self, context: str, message: str):
         prompt = f"Context: {context}\n\nQuestion: {message}\n\nAnswer based on the context."
-        gemini_response = self.model.generate_content(prompt)
-        if gemini_response.parts:
-            return gemini_response.text
-        return "Error generating response."
+        print(f"🤖 Generating AI response for message: {message[:50]}...")
+        try:
+            gemini_response = self.model.generate_content(prompt)
+            if gemini_response.parts:
+                return gemini_response.text
+            return "AI Model returned an empty response."
+        except Exception as e:
+            print(f"❌ AI Generation Error: {str(e)}")
+            raise e
 
 ai_service = AIService()

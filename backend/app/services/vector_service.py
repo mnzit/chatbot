@@ -41,7 +41,11 @@ class VectorService:
         return collection
 
     def query(self, collection_name: str, message: str):
-        collection = self.client.get_collection(name=collection_name)
+        try:
+            collection = self.client.get_collection(name=collection_name)
+        except Exception:
+            return "No background context found for this bot."
+            
         query_embedding = self.model.encode(message)
         results = collection.query(
             query_embeddings=[query_embedding.tolist()],

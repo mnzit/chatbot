@@ -16,4 +16,7 @@ async def chat_with_bot(chat_msg: ChatMessage):
         
         return {"response": response}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        error_msg = str(e)
+        if "429" in error_msg or "quota" in error_msg.lower():
+            return {"response": "I'm currently receiving too many requests. Please wait a moment and try again! ⏳"}
+        raise HTTPException(status_code=500, detail=error_msg)

@@ -156,6 +156,15 @@ To find the right context, the system calculates the "distance" between the user
 The final step uses the **`gemini-flash-latest`** model from Google.
 *   **Type**: A generative pretrained transformer.
 *   **Process**: It uses **In-Context Learning**. By providing the retrieved snippets inside the prompt, we "steer" the model to behave like a specialist assistant rather than a general-purpose AI.
+*   **Error Handling**: The system now detects when you hit the **Gemini API Quota** (the 20 requests/day limit on free accounts) and returns a friendly "I'm busy" message instead of a generic error.
+
+---
+
+## 📄 PDF Knowledge Support
+You can now upload **PDF files** when creating a bot. 
+1.  **Extraction**: The system uses `PyPDF2` to read every page of your PDF.
+2.  **Chunking**: To avoid AI memory limits, it splits long documents into smaller "chunks".
+3.  **Search**: When you ask a question, it finds the specific chunks in your PDF that hold the answer.
 
 ---
 
