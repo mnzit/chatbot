@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import styled from '@emotion/styled';
 
@@ -79,6 +79,19 @@ const Textarea = styled.textarea`
   &:focus { border-color: #0070f3; }
 `;
 
+const FileInputLabel = styled.label`
+  padding: 0.875rem 1rem;
+  border-radius: 8px;
+  border: 2px dashed #e1e4e8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  &:hover { border-color: #0070f3; }
+`;
+
 const Button = styled.button`
   padding: 0.875rem;
   border-radius: 8px;
@@ -142,7 +155,9 @@ function App() {
   const [bots, setBots] = useState([]);
   const [botName, setBotName] = useState('');
   const [context, setContext] = useState('');
+  const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -155,7 +170,7 @@ function App() {
 
   const fetchBots = async (token) => {
     try {
-      const res = await fetch('http://localhost:8000/bots', {
+      const res = await fetch('http://localhost:8000/api/bots/', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -170,19 +185,22 @@ function App() {
   const handleAuth = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const endpoint = view === 'login' ? 'token' : 'register';
+    const endpoint = view === 'login' ? 'api/auth/token' : 'api/auth/register';
 
     try {
       let body;
+      const headers = {};
       if (view === 'login') {
         body = new URLSearchParams({ username: email, password });
+        headers['Content-Type'] = 'application/x-www-form-urlencoded';
       } else {
         body = JSON.stringify({ email, password });
+        headers['Content-Type'] = 'application/json';
       }
 
       const res = await fetch(`http://localhost:8000/${endpoint}`, {
         method: 'POST',
-        headers: view === 'login' ? { 'Content-Type': 'application/x-www-form-urlencoded' } : { 'Content-Type': 'application/json' },
+        headers,
         body
       });
 
@@ -193,7 +211,8 @@ function App() {
         setView('dashboard');
         fetchBots(data.access_token);
       } else {
-        alert('Authentication failed');
+        const error = await res.json();
+        alert(error.detail || 'Authentication failed');
       }
     } catch (e) {
       alert('Error: ' + e.message);
@@ -205,23 +224,36 @@ function App() {
   const handleCreateBot = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+    const formData = new FormData();
+    formData.append('name', botName);
+    formData.append('context', context);
+    if (files.length > 0) {
+      for (let i = 0; i < files.length; i++) {
+        formData.append('files', files[i]);
+      }
+    }
+
     try {
-      const res = await fetch('http://localhost:8000/create-bot', {
+      const res = await fetch('http://localhost:8000/api/bots/', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${user.token}`
         },
-        body: JSON.stringify({ name: botName, context })
+        body: formData
       });
       if (res.ok) {
         setBotName('');
         setContext('');
+        setFiles([]);
         setView('dashboard');
         fetchBots(user.token);
+      } else {
+        const error = await res.json();
+        alert(error.detail || 'Error creating bot');
       }
     } catch (e) {
-      alert('Error creating bot');
+      alert('Error creating bot: ' + e.message);
     } finally {
       setLoading(false);
     }
@@ -284,7 +316,30 @@ function App() {
             <Title>Create New Bot</Title>
             <Form onSubmit={handleCreateBot}>
               <Input placeholder="Bot Name (e.g., Customer Support)" value={botName} onChange={e => setBotName(e.target.value)} required />
-              <Textarea placeholder="What should this bot know? Paste your content/knowledge base here..." value={context} onChange={e => setContext(e.target.value)} required />
+              <Textarea placeholder="What should this bot know? Paste your content here..." value={context} onChange={e => setContext(e.target.value)} />
+
+              <div style={{ marginBottom: '1rem' }}>
+                <p style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '8px' }}>Upload PDF Knowledge (Optional)</p>
+                <FileInputLabel>
+                  <input
+                    type="file"
+                    multiple
+                    accept=".pdf"
+                    onChange={e => setFiles(Array.from(e.target.files))}
+                    style={{ display: 'none' }}
+                  />
+                  <div style={{ fontSize: '1.25rem' }}>📄</div>
+                  <div style={{ fontSize: '0.85rem', color: '#666' }}>
+                    {files.length > 0 ? `${files.length} files selected` : 'Click to select PDF files'}
+                  </div>
+                </FileInputLabel>
+                {files.length > 0 && (
+                  <ul style={{ margin: '8px 0', padding: 0, fontSize: '0.75rem', color: '#666', listStyle: 'none' }}>
+                    {files.map(f => <li key={f.name}>✅ {f.name}</li>)}
+                  </ul>
+                )}
+              </div>
+
               <Button type="submit" disabled={loading}>{loading ? 'Creating...' : 'Launch Bot'}</Button>
               <GhostButton type="button" onClick={() => setView('dashboard')}>Cancel</GhostButton>
             </Form>
