@@ -23,7 +23,7 @@ if [ -d ".venv" ]; then
 else
     echo "⚠️ Warning: .venv not found. Attempting to run with system python..."
 fi
-python main.py &
+python -m app.main &
 
 # 2. Start Frontend
 echo "💻 Starting Frontend (Vite) on http://localhost:5173..."
