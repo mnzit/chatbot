@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+.env
+chroma_db/
+
+# Node
+node_modules/
+.vite/
+dist/
+dist-ssr/
+*.local
+
+# OS
+.DS_Store
+.idea/
+.vscode/
