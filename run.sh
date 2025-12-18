@@ -19,7 +19,11 @@ trap cleanup SIGINT SIGTERM
 echo "📦 Starting Backend (FastAPI) on http://localhost:8000..."
 cd "$PROJECT_ROOT/backend"
 if [ -d ".venv" ]; then
-    source .venv/bin/activate
+    if [ -f ".venv/bin/activate" ]; then
+        source .venv/bin/activate
+    elif [ -f ".venv/Scripts/activate" ]; then
+        source .venv/Scripts/activate
+    fi
 else
     echo "⚠️ Warning: .venv not found. Attempting to run with system python..."
 fi

@@ -35,9 +35,18 @@ if [ ! -d ".venv" ]; then
     python3 -m venv .venv
 fi
 
-# Activate virtual environment and install dependencies
-echo "  - Installing Python dependencies..."
-source .venv/bin/activate
+# Activate virtual environment
+if [ -f ".venv/bin/activate" ]; then
+    VENV_ACTIVATE=".venv/bin/activate"
+elif [ -f ".venv/Scripts/activate" ]; then
+    VENV_ACTIVATE=".venv/Scripts/activate"
+else
+    echo "❌ Error: Could not find virtual environment activation script."
+    exit 1
+fi
+
+echo "  - Activating environment and installing Python dependencies..."
+source "$VENV_ACTIVATE"
 pip install --upgrade pip
 pip install -r requirements.txt
 
